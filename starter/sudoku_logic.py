@@ -139,7 +139,7 @@ def generate_puzzle(clues=35):
         solution = deep_copy(generated_board)
         puzzle = deep_copy(generated_board)
 
-        if _remove_cells_while_preserving_uniqueness(puzzle, clues):
+        if _remove_cells_while_preserving_uniqueness(puzzle, clues) and has_unique_solution(puzzle):
             return puzzle, solution
 
     raise RuntimeError('Unable to generate a uniquely solvable puzzle with requested clues')

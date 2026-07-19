@@ -35,6 +35,30 @@ def test_stylesheet_contains_subgrid_and_dark_mode_support(client):
     assert '@media (prefers-color-scheme: dark)' in css
 
 
+def test_main_js_scoreboard_uses_localstorage_and_top_ten_limit(client):
+    response = client.get('/static/main.js')
+    assert response.status_code == 200
+
+    script = response.get_data(as_text=True)
+    assert "SCOREBOARD_STORAGE_KEY = 'sudokuTopScores'" in script
+    assert 'MAX_SCOREBOARD_ENTRIES = 10' in script
+    assert 'localStorage.getItem(SCOREBOARD_STORAGE_KEY)' in script
+    assert 'localStorage.setItem(SCOREBOARD_STORAGE_KEY' in script
+    assert 'sort((left, right) => left.elapsedMilliseconds - right.elapsedMilliseconds)' in script
+    assert 'slice(0, MAX_SCOREBOARD_ENTRIES)' in script
+
+
+def test_main_js_scoreboard_saves_required_score_fields(client):
+    response = client.get('/static/main.js')
+    assert response.status_code == 200
+
+    script = response.get_data(as_text=True)
+    assert 'playerName: getPlayerName()' in script
+    assert 'elapsedMilliseconds: elapsedTimeMilliseconds()' in script
+    assert 'difficulty: currentDifficulty' in script
+    assert 'hintsUsed' in script
+
+
 def test_new_route_returns_puzzle(client):
     response = client.get("/new?clues=35")
     assert response.status_code == 200

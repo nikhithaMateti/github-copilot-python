@@ -72,19 +72,23 @@ def check_solution():
 
 @app.route('/hint', methods=['POST'])
 def reveal_hint():
-    current_puzzle = CURRENT.get('puzzle')
+    request_payload = request.json
+    submitted_board = request_payload.get('board')
+
     current_solution = CURRENT.get('solution')
 
-    if current_puzzle is None or current_solution is None:
+    if submitted_board is None or current_solution is None:
         return _missing_game_response()
 
-    available_positions = _empty_positions(current_puzzle)
+    available_positions = _empty_positions(submitted_board)
+
     if not available_positions:
         return jsonify({'hint': None, 'message': 'No empty cells available'})
 
     row_index, col_index = random.choice(available_positions)
     hinted_value = current_solution[row_index][col_index]
-    current_puzzle[row_index][col_index] = hinted_value
+
+    submitted_board[row_index][col_index] = hinted_value
 
     return jsonify({
         'hint': {
@@ -92,8 +96,7 @@ def reveal_hint():
             'col': col_index,
             'value': hinted_value,
         },
-        'puzzle': current_puzzle,
+        'puzzle': submitted_board,
     })
-
 if __name__ == '__main__':
     app.run(debug=True)

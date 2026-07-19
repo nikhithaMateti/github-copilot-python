@@ -7,6 +7,15 @@
     --cell-focus: #d8f3ff;
     --subgrid-a-bg: #f8f8f8;
     --subgrid-b-bg: #efefef;
+    --box-1-bg: #f8fbff;
+    --box-2-bg: #fff9f1;
+    --box-3-bg: #f4fbf3;
+    --box-4-bg: #fff5f7;
+    --box-5-bg: #f5f5ff;
+    --box-6-bg: #f3fcfa;
+    --box-7-bg: #fff7ef;
+    --box-8-bg: #f3f8ff;
+    --box-9-bg: #f8f4ff;
     --prefilled-text: #222222;
     --incorrect-bg: #ffcdd2;
     --control-border: #bbbbbb;
@@ -16,27 +25,19 @@
     --panel-border: #dddddd;
     --panel-shadow: rgba(0, 0, 0, 0.08);
 }
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --page-bg: #161b22;
-        --panel-bg: #1f2630;
-        --text-main: #e6edf3;
-        --board-border: #5a6575;
-        --cell-border: #455062;
-        --cell-focus: #2f4f75;
-        --subgrid-a-bg: #273140;
-        --subgrid-b-bg: #303b4d;
-        --prefilled-text: #ffffff;
-        --incorrect-bg: #8a3d46;
-        --control-border: #5a6575;
-        --button-bg: #2f81f7;
-        --button-hover-bg: #1f6feb;
-        --button-text: #ffffff;
-        --panel-border: #3b4759;
-        --panel-shadow: rgba(0, 0, 0, 0.35);
-    }
-}
+ :root.dark-mode {
+    --page-bg: #161b22;
+    --panel-bg: #1f2630;
+    --text-main: #e6edf3;
+    --board-border: #5a6575;
+    --cell-border: #455062;
+    --cell-focus: #2f4f75;
+    --subgrid-a-bg: #273140;
+    --subgrid-b-bg: #303b4d;
+    --box-1-bg: #2a3444;
+    --box-2-bg: #3a3429;
+    --box-3
+ }
 
 body {
     font-family: Arial, sans-serif;
@@ -82,6 +83,43 @@ h1 {
 
 .sudoku-cell.subgrid-b {
     background: var(--subgrid-b-bg);
+}
+
+/* Assign a distinct color to each 3x3 box for faster visual parsing. */
+.sudoku-row:nth-child(-n+3) .sudoku-cell:nth-child(-n+3) {
+    background: var(--box-1-bg);
+}
+
+.sudoku-row:nth-child(-n+3) .sudoku-cell:nth-child(n+4):nth-child(-n+6) {
+    background: var(--box-2-bg);
+}
+
+.sudoku-row:nth-child(-n+3) .sudoku-cell:nth-child(n+7):nth-child(-n+9) {
+    background: var(--box-3-bg);
+}
+
+.sudoku-row:nth-child(n+4):nth-child(-n+6) .sudoku-cell:nth-child(-n+3) {
+    background: var(--box-4-bg);
+}
+
+.sudoku-row:nth-child(n+4):nth-child(-n+6) .sudoku-cell:nth-child(n+4):nth-child(-n+6) {
+    background: var(--box-5-bg);
+}
+
+.sudoku-row:nth-child(n+4):nth-child(-n+6) .sudoku-cell:nth-child(n+7):nth-child(-n+9) {
+    background: var(--box-6-bg);
+}
+
+.sudoku-row:nth-child(n+7):nth-child(-n+9) .sudoku-cell:nth-child(-n+3) {
+    background: var(--box-7-bg);
+}
+
+.sudoku-row:nth-child(n+7):nth-child(-n+9) .sudoku-cell:nth-child(n+4):nth-child(-n+6) {
+    background: var(--box-8-bg);
+}
+
+.sudoku-row:nth-child(n+7):nth-child(-n+9) .sudoku-cell:nth-child(n+7):nth-child(-n+9) {
+    background: var(--box-9-bg);
 }
 
 .sudoku-cell:focus {
@@ -214,4 +252,6 @@ button:hover {
         margin: 16px 12px 28px;
         padding: 14px;
     }
+   
+  
 }

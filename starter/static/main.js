@@ -145,7 +145,9 @@ function loadScores() {
 }
 
 function saveScores(scores) {
-  localStorage.setItem(SCOREBOARD_STORAGE_KEY, JSON.stringify(scores));
+  const normalizedScores = scores.map(normalizeScore).filter(Boolean);
+  const fastestScores = sortAndTrimScores(normalizedScores);
+  localStorage.setItem(SCOREBOARD_STORAGE_KEY, JSON.stringify(fastestScores));
 }
 
 function sortAndTrimScores(scores) {
@@ -304,13 +306,25 @@ async function checkSolution() {
   });
 
   const data = await response.json();
+
   if (data.error) {
     setMessage(data.error, '#d32f2f');
     return;
   }
 
-  const incorrectCells = new Set(data.incorrect.map(cell => toFlatCellIndex(cell[0], cell[1])));
+  const incorrectCells = new Set(
+    data.incorrect.map(cell => toFlatCellIndex(cell[0], cell[1]))
+  );
+
   highlightIncorrectCells(inputs, incorrectCells);
+
+  // Check whether the board still contains empty cells
+  const hasEmptyCells = board.some(row => row.includes(0));
+
+  if (hasEmptyCells) {
+    setMessage('Please complete the Sudoku before checking.', '#d32f2f');
+    return;
+  }
 
   if (incorrectCells.size === 0) {
     if (!isGameSolved) {
@@ -318,6 +332,7 @@ async function checkSolution() {
       stopTimer();
       isGameSolved = true;
     }
+
     setMessage('Congratulations! You solved it!', '#388e3c');
   } else {
     setMessage('Some cells are incorrect.', '#d32f2f');
@@ -325,10 +340,15 @@ async function checkSolution() {
 }
 
 async function requestHint() {
-  const response = await fetch('/hint', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'}
-  });
+ const boardElement = getBoardElement();
+const inputs = boardElement.getElementsByTagName('input');
+const board = readBoardFromInputs(inputs);
+
+const response = await fetch('/hint', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({ board })
+});
 
   const data = await response.json();
   if (data.error) {
@@ -341,8 +361,7 @@ async function requestHint() {
     return;
   }
 
-  const boardElement = getBoardElement();
-  const inputs = boardElement.getElementsByTagName('input');
+  
   const {row, col, value} = data.hint;
   lockCell(inputs, row, col, value);
   puzzle[row][col] = value;
@@ -351,10 +370,34 @@ async function requestHint() {
 }
 
 // Wire buttons
+function toggleTheme() {
+    document.documentElement.classList.toggle('dark-mode');
+
+    const button = document.getElementById('theme-toggle');
+
+    if (document.documentElement.classList.contains('dark-mode')) {
+        button.textContent = '☀️ Light Mode';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        button.textContent = '🌙 Dark Mode';
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+function loadTheme() {
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+        document.getElementById('theme-toggle').textContent = '☀️ Light Mode';
+    }
+}
 window.addEventListener('load', () => {
   document.getElementById('new-game').addEventListener('click', newGame);
   document.getElementById('hint').addEventListener('click', requestHint);
   document.getElementById('check-solution').addEventListener('click', checkSolution);
+  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+  loadTheme();
   renderScoreboard();
   // initialize
   newGame();

@@ -25,7 +25,10 @@ def test_generate_puzzle_has_requested_clue_count():
     assert non_empty == clues
 
 
-@pytest.mark.parametrize('clues', [45, 35, 28])
-def test_generate_puzzle_has_unique_solution(clues):
+@pytest.mark.parametrize('clues', [50, 45, 35, 28, 24])
+def test_generate_puzzle_keeps_clue_count_and_has_unique_solution(clues):
     puzzle, _ = sudoku_logic.generate_puzzle(clues=clues)
+
+    non_empty = sum(1 for row in puzzle for value in row if value != sudoku_logic.EMPTY)
+    assert non_empty == clues
     assert sudoku_logic.has_unique_solution(puzzle)
